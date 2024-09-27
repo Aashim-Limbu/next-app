@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { Todo } from "../api/getTodo";
 
 export default async function toggleTodo(id: string, todo: Todo) {
+    await wait (3000)
 	await fetch(`http://localhost:3000/todos/${id}`, {
 		method: "PATCH",
 		headers: {
@@ -14,4 +15,9 @@ export default async function toggleTodo(id: string, todo: Todo) {
 		}),
 	}).then((res) => res.json());
 	revalidatePath("/");
+}
+function wait (duration: number){
+    return new Promise(resolve=>{
+        setTimeout(resolve,duration)
+    })
 }
