@@ -3,9 +3,13 @@ import React, { useEffect, useRef, useState, useTransition } from "react";
 import { Todo } from "../api/getTodo";
 import { createTodo } from "../actions/createTodo";
 import toggleTodo from "../actions/toggleTodo";
+import Checkbox from "./checkbox";
+import FormButton from "./FormButton";
 // import { revalidatePath } from "next/cache";
+import { useFormState } from "react-dom";
 function TodoForm({ todos }: { todos: Todo[] }) {
 	const [isPending, startTransition] = useTransition();
+	const [error, action] = useFormState(createTodo, { errorMsg: "" });
 	const inputRef = useRef<HTMLInputElement>(null);
 	const editRef = useRef<HTMLInputElement>(null);
 	const [isedit, setisEdit] = useState<string | null>(null);
@@ -25,12 +29,11 @@ function TodoForm({ todos }: { todos: Todo[] }) {
 	}
 	return (
 		<>
+			{error && (
+				<div className="text-red-500 font-semibold">{error.errorMsg}</div>
+			)}
 			<form
-				action={async (formData) => {
-					await createTodo(formData);
-					if (!inputRef.current) return;
-					inputRef.current.value = "";
-				}} //! just by defining actions it prevent the default behavior of submisssion
+				action={action} //! just by defining actions it prevent the default behavior of submisssion
 				className="bg-slate-200 flex flex-col py-5 px-2 gap-2 rounded-md"
 			>
 				<div className="flex gap-x-2">
@@ -40,20 +43,22 @@ function TodoForm({ todos }: { todos: Todo[] }) {
 						type="text"
 						ref={inputRef}
 					/>
-					<button
+					{/* <button
 						className="bg-indigo-600 p-1 rounded-md text-white font-semibold  hover:bg-indigo-700 cursor-pointer"
 						type="submit"
 					>
 						Add Task
-					</button>
+					</button> */}
+					<FormButton />
 				</div>
 			</form>
 			<ul className="py-2 bg-slate-300 flex flex-col gap-2 px-2">
 				{todos.map((todo) => (
 					<li className="flex  items-center gap-x-4" key={todo.id}>
-						<input
+						<Checkbox todo={todo} />
+						{/* <input
 							type="checkbox"
-							disabled={isPending}
+                            disabled={isPending}
 							onChange={async (e) => {
 								await toggleTodo(todo.id.toString(), {
 									...todo,
@@ -61,7 +66,7 @@ function TodoForm({ todos }: { todos: Todo[] }) {
 								});
 							}}
 							checked={todo.completed}
-						/>
+						/> */}
 						{isedit === todo.id.toString() ? (
 							<div className="flex items-center justify-center gap-x-2 py-2">
 								<input
